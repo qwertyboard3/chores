@@ -4,7 +4,7 @@
   "start_url": "index.html"
   "display": "fullscreen",
   "background_color": "#f0f4f8",
-  "theme_color": "#000000",
+  "theme_color": "#f0f4f8",
   "icons": [
     {
       "src": "icons/icon-192.png",
@@ -18,5 +18,6 @@
     }
   ]
 }
+
 
 
