@@ -42,27 +42,33 @@ body {
       font-weight: bold;
       color: #ffd700;
     }
+     /* Glassmorphism table */
     table {
       width: 100%;
       border-collapse: collapse;
-      background: #1e1e1e;
-      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+      background-color: rgba(30, 30, 30, 0.4);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
     }
     th, td {
-      border: 1px solid #333;
+      border: 1px solid rgba(255, 255, 255, 0.2);
       padding: 12px;
       text-align: center;
       vertical-align: middle;
+      background-color: transparent;
     }
     tr.day-row {
-      border-bottom: 4px solid #444;
+      border-bottom: 4px solid rgba(255, 255, 255, 0.1);
     }
     tr.chore-row {
-      border-bottom: 4px solid #444;
+      border-bottom: 4px solid rgba(255, 255, 255, 0.1);
     }
     th {
-      background-color: #2c2c2c;
+      background-color: rgba(44, 44, 44, 0.6);
     }
+
+    /* Toggle switch */
     .toggle {
       position: relative;
       display: inline-block;
@@ -103,9 +109,8 @@ body {
     .locked input {
       pointer-events: none;
     }
-    .locked input:disabled {
-      pointer-events: none;
-    }
+
+    /* Unlock button */
     #unlock-btn {
       margin-bottom: 20px;
       padding: 10px 20px;
@@ -117,6 +122,7 @@ body {
       cursor: pointer;
     }
   </style>
+
 </head>
 <body>
   <h1>Weekly Chores Table for Daphne & Naomi</h1>
