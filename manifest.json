@@ -1,5 +1,5 @@
 {
-  "name": "Chores Tracker",
+  "name": "Chores",
   "short_name": "Chores",
   "start_url": "index.html"
   "display": "fullscreen",
@@ -18,4 +18,5 @@
     }
   ]
 }
+
 
