@@ -1,7 +1,7 @@
 {
   "name": "Chores Tracker",
   "short_name": "Chores",
-  "start_url": "/index.html",
+  "start_url": "index.html"
   "display": "fullscreen",
   "background_color": "#f0f4f8",
   "theme_color": "#000000",
@@ -18,3 +18,4 @@
     }
   ]
 }
+
