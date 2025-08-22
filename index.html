@@ -225,19 +225,23 @@
       const percent = Math.round((completed / total) * 100);
       document.getElementById("progress-fill").style.width = percent + "%";
       document.getElementById("reward-message").textContent =
-        percent >= 80 ? "🎉 Starbucks reward unlocked!" : "";
+        percent >= 70 ? "🎉 Starbucks reward unlocked!" : "";
     }
 
-    document.getElementById("unlock-btn").addEventListener("click", () => {
-      const passcode = prompt("Enter admin passcode:");
-      if (passcode === "2025") {
-        document.querySelectorAll(".toggle").forEach(toggle => {
-          toggle.classList.remove("locked");
-        });
-      } else {
-        alert("Incorrect passcode.");
-      }
+document.getElementById("unlock-btn").addEventListener("click", () => {
+  const passcode = prompt("Enter admin passcode:");
+  if (passcode === "2025") {
+    document.querySelectorAll(".toggle").forEach(toggle => {
+      toggle.classList.remove("locked");
+      const input = toggle.querySelector("input");
+      if (input) input.disabled = false; // ✅ Enable checkbox
     });
+  } else {
+    alert("Incorrect passcode.");
+  }
+});
+
+
 
     window.onload = loadToggles;
   </script>
