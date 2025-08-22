@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chores Tracker</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #121212;
+      color: #e0e0e0;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    #progress-container {
+      margin-bottom: 20px;
+    }
+    #progress-bar {
+      width: 100%;
+      background: #333;
+      border-radius: 10px;
+      overflow: hidden;
+      height: 20px;
+    }
+    #progress-fill {
+      height: 100%;
+      background: #4caf50;
+      width: 0%;
+      transition: width 0.5s;
+    }
+    #reward-message {
+      text-align: center;
+      margin-top: 10px;
+      font-weight: bold;
+      color: #ffd700;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #1e1e1e;
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    }
+    th, td {
+      border: 1px solid #333;
+      padding: 12px;
+      text-align: center;
+      vertical-align: middle;
+    }
+    tr {
+      border-bottom: 4px solid #444;
+    }
+    th {
+      background-color: #2c2c2c;
+    }
+    .toggle {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 24px;
+    }
+    .toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0;
+      right: 0; bottom: 0;
+      background-color: #555;
+      transition: .4s;
+      border-radius: 24px;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+    input:checked + .slider {
+      background-color: #4caf50;
+    }
+    input:checked + .slider:before {
+      transform: translateX(26px);
+    }
+    .locked input {
+      pointer-events: none;
+    }
+    #unlock-btn {
+      margin-bottom: 20px;
+      padding: 10px 20px;
+      font-size: 16px;
+      background: #4caf50;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>Weekly Chores Table for Daphne & Naomi</h1>
+  <div id="progress-container">
+    <div id="progress-bar"><div id="progress-fill"></div></div>
+    <div id="reward-message"></div>
+  </div>
+  <button id="unlock-btn">Unlock Toggles</button>
+  <table>
+    <thead>
+      <tr><th>Day</th><th>Daphne's Chores</th><th>Naomi's Chores</th></tr>
+    </thead>
+    <tbody id="chores-table"></tbody>
+  </table>
+
+  <script src="https://www.gstatic.com/firebasejs/10.5.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.5.2/firebase-database-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyC-LdUp3UKbX6pS1_vRmXVyK9FBSdqHNCs",
+      authDomain: "chores-972bd.firebaseapp.com",
+      databaseURL: "https://chores-972bd-default-rtdb.firebaseio.com",
+      projectId: "chores-972bd",
+      storageBucket: "chores-972bd.appspot.com",
+      messagingSenderId: "761975957910",
+      appId: "1:761975957910:web:edfc23fc53a5ea7db155b7",
+      measurementId: "G-EW18VSQN20"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    const schedule = [
+      { day: "Monday", daphne: ["🐾 Pets", "📚 Homework"], naomi: ["🎒 Getting Ready", "📚 Homework"] },
+      { day: "Tuesday", daphne: ["🐾 Pets", "🎒 Getting Ready"], naomi: ["🐾 Pets", "📚 Homework"] },
+      { day: "Wednesday", daphne: ["🐾 Pets", "📚 Homework"], naomi: ["🎒 Getting Ready", "📚 Homework"] },
+      { day: "Thursday", daphne: ["🐾 Pets", "🎒 Getting Ready"], naomi: ["🐾 Pets", "📚 Homework"] },
+      { day: "Friday", daphne: ["🐾 Pets", "📚 Homework"], naomi: ["🎒 Getting Ready", "📚 Homework"] },
+      { day: "Saturday", daphne: ["🐾 Pets", "—"], naomi: ["🐾 Pets", "—"] },
+      { day: "Sunday", daphne: ["🐾 Pets", "—"], naomi: ["🐾 Pets", "—"] },
+    ];
+
+    const table = document.getElementById("chores-table");
+
+    schedule.forEach(entry => {
+      const row1 = document.createElement("tr");
+      row1.innerHTML = `
+        <td rowspan="2">${entry.day}</td>
+        <td>${entry.daphne[0]} ${createToggle(entry.day, "Daphne", entry.daphne[0])}</td>
+        <td>${entry.naomi[0]} ${createToggle(entry.day, "Naomi", entry.naomi[0])}</td>
+      `;
+      const row2 = document.createElement("tr");
+      row2.innerHTML = `
+        <td>${entry.daphne[1] !== "—" ? entry.daphne[1] + " " + createToggle(entry.day, "Daphne", entry.daphne[1]) : "—"}</td>
+        <td>${entry.naomi[1] !== "—" ? entry.naomi[1] + " " + createToggle(entry.day, "Naomi", entry.naomi[1]) : "—"}</td>
+      `;
+      table.appendChild(row1);
+      table.appendChild(row2);
+    });
+
+    function createToggle(day, kid, chore) {
+      const id = `${day}-${kid}-${chore}`.replace(/\s+/g, '-');
+      return `
+        <label class="toggle locked">
+          <input type="checkbox" id="${id}" onchange="updateToggle('${id}')" />
+          <span class="slider"></span>
+        </label>
+      `;
+    }
+
+    function updateToggle(id) {
+      const checked = document.getElementById(id).checked;
+      db.ref("toggles/" + id).set(checked);
+      calculateProgress();
+    }
+
+    function loadToggles() {
+      db.ref("toggles").once("value", snapshot => {
+        const data = snapshot.val();
+        if (data) {
+          Object.keys(data).forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.checked = data[id];
+          });
+        }
+        calculateProgress();
+      });
+    }
+
+    function calculateProgress() {
+      const toggles = document.querySelectorAll("input[type='checkbox']");
+      const total = toggles.length;
+      let completed = 0;
+      toggles.forEach(t => { if (t.checked) completed++; });
+      const percent = Math.round((completed / total) * 100);
+      document.getElementById("progress-fill").style.width = percent + "%";
+      document.getElementById("reward-message").textContent =
+        percent >= 80 ? "🎉 Starbucks reward unlocked!" : "";
+    }
+
+    document.getElementById("unlock-btn").addEventListener("click", () => {
+      const passcode = prompt("Enter admin passcode:");
+      if (passcode === "2025") {
+        document.querySelectorAll(".toggle").forEach(toggle => {
+          toggle.classList.remove("locked");
+        });
+      } else {
+        alert("Incorrect passcode.");
+      }
+    });
+
+    window.onload = loadToggles;
+  </script>
+</body>
+</html>
