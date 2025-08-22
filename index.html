@@ -7,268 +7,383 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Chores Tracker">
 
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="manifest" href="/manifest.json" />
 
-  <!-- PWA Manifest -->
-  <link rel="manifest" href="/manifest.json" />
+<meta name="theme-color" content="#4a90e2" />
 
-  <!-- Theme Color for Browser UI -->
-  <meta name="theme-color" content="#4a90e2" />
+<link rel="apple-touch-icon" href="/icons/icon-192.png" />
 
-  <!-- Apple Touch Icon (for iOS) -->
-  <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="apple-mobile-web-app-title" content="Chores Tracker" />
 
-  <!-- iOS PWA Support -->
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-  <meta name="apple-mobile-web-app-title" content="Chores Tracker" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 
-
+<title>Chores Tracker</title>
+<style>
+  body {
+    font-family: 'Poppins', sans-serif;
+    background: #121212;
+    color: #e0e0e0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    
+    /* New background image properties */
+    background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('background.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+  }
   
-  <title>Chores Tracker</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #121212;
-      color: #e0e0e0;
-      padding: 20px;
+  h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #f5f5f5;
+    font-weight: 600;
+  }
+  #progress-container {
+    width: 100%;
+    max-width: 600px;
+    margin-bottom: 20px;
+  }
+  #progress-bar {
+    width: 100%;
+    background: #333;
+    border-radius: 10px;
+    overflow: hidden;
+    height: 25px; /* Increased height */
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.4); /* Inner shadow for depth */
+  }
+  #progress-fill {
+    height: 100%;
+    background: linear-gradient(to right, #4caf50, #8bc34a); /* Gradient effect */
+    width: 0%;
+    transition: width 0.5s ease-in-out;
+  }
+  #reward-message {
+    text-align: center;
+    margin-top: 15px; /* Increased margin */
+    font-weight: bold;
+    color: #ffd700;
+    font-size: 1.2em; /* Larger font size */
+    text-shadow: 0 0 5px rgba(255, 215, 0, 0.5); /* Glow effect */
+  }
+  @keyframes reward-bounce {
+    0%, 100% {
+      transform: scale(1);
     }
-    h1 {
-      text-align: center;
-      margin-bottom: 20px;
+    50% {
+      transform: scale(1.1);
     }
-    #progress-container {
-      margin-bottom: 20px;
+  }
+
+  .animate-reward {
+    animation: reward-bounce 0.8s ease-in-out;
+  }
+  
+  /* Full-screen reward animation container */
+  #reward-animation {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 999;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.5s ease-out;
+  }
+
+  #reward-animation.active {
+    opacity: 1;
+  }
+
+  /* The actual burst animation */
+  #reward-animation.active::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100vw;
+    height: 100vh;
+    background: radial-gradient(circle, #ffd70044 0%, transparent 70%);
+    border-radius: 50%;
+    transform: scale(0);
+    animation: reward-burst 2s ease-out forwards;
+  }
+
+  @keyframes reward-burst {
+    0% {
+      transform: scale(0);
+      opacity: 1;
     }
-    #progress-bar {
-      width: 100%;
-      background: #333;
-      border-radius: 10px;
-      overflow: hidden;
-      height: 20px;
+    50% {
+      transform: scale(1.5);
+      opacity: 1;
     }
-    #progress-fill {
-      height: 100%;
-      background: #4caf50;
-      width: 0%;
-      transition: width 0.5s;
-    }
-    #reward-message {
-      text-align: center;
-      margin-top: 10px;
-      font-weight: bold;
-      color: #ffd700;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      background: #1e1e1e;
-      box-shadow: 0 0 10px rgba(0,0,0,0.5);
-    }
-    th, td {
-      border: 1px solid #333;
-      padding: 12px;
-      text-align: center;
-      vertical-align: middle;
-    }
-    tr.day-row {
-      border-bottom: 4px solid #444;
-    }
-    tr.chore-row {
-      border-bottom: 4px solid #444;
-    }
-    th {
-      background-color: #2c2c2c;
-    }
-    .toggle {
-      position: relative;
-      display: inline-block;
-      width: 50px;
-      height: 24px;
-    }
-    .toggle input {
+    100% {
+      transform: scale(2);
       opacity: 0;
-      width: 0;
-      height: 0;
     }
-    .slider {
-      position: absolute;
-      cursor: pointer;
-      top: 0; left: 0;
-      right: 0; bottom: 0;
-      background-color: #555;
-      transition: .4s;
-      border-radius: 24px;
-    }
-    .slider:before {
-      position: absolute;
-      content: "";
-      height: 18px;
-      width: 18px;
-      left: 3px;
-      bottom: 3px;
-      background-color: white;
-      transition: .4s;
-      border-radius: 50%;
-    }
-    input:checked + .slider {
-      background-color: #4caf50;
-    }
-    input:checked + .slider:before {
-      transform: translateX(26px);
-    }
-    .locked input {
-      pointer-events: none;
-    }
-    .locked input:disabled {
-      pointer-events: none;
-    }
-    #unlock-btn {
-      margin-bottom: 20px;
-      padding: 10px 20px;
-      font-size: 16px;
-      background: #4caf50;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-  </style>
+  }
+  
+  table {
+    width: 100%;
+    max-width: 900px;
+    border-collapse: collapse;
+    background: #1e1e1e;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5); /* Stronger shadow */
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  th, td {
+    border: none; /* Removed borders for a cleaner look */
+    padding: 15px; /* Increased padding */
+    text-align: center;
+    vertical-align: middle;
+  }
+  tr.day-row {
+    background-color: #2c2c2c; /* Different background for day rows */
+  }
+  tr.chore-row:hover {
+    background-color: #252525; /* Hover effect */
+    transition: background-color 0.3s ease;
+  }
+  th {
+    background-color: #2c2c2c;
+    color: #fafafa;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 0.9em;
+  }
+  td:first-child {
+    font-weight: 600;
+    background-color: #252525;
+    border-right: 1px solid #333; /* Separator for day column */
+  }
+  .chore-cell {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 10px;
+  }
+  .toggle {
+    position: relative;
+    display: inline-block;
+    width: 55px; /* Increased width */
+    height: 28px; /* Increased height */
+  }
+  .toggle input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0;
+    right: 0; bottom: 0;
+    background-color: #555;
+    transition: .4s;
+    border-radius: 28px; /* Matched height */
+  }
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 22px; /* Increased height */
+    width: 22px; /* Increased width */
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+  }
+  input:checked + .slider {
+    background-color: #4caf50;
+  }
+  input:checked + .slider:before {
+    transform: translateX(27px); /* Adjusted for new toggle width */
+  }
+  .locked input {
+    pointer-events: none;
+  }
+  .locked input:disabled {
+    pointer-events: none;
+  }
+  #unlock-btn {
+    margin-bottom: 20px;
+    padding: 12px 24px;
+    font-size: 16px;
+    background: #4caf50;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+  }
+  #unlock-btn:hover {
+    background: #66bb6a;
+  }
+</style>
 </head>
 <body>
-  <h1>Weekly Chores Table for Daphne & Naomi</h1>
-  <div id="progress-container">
-    <div id="progress-bar"><div id="progress-fill"></div></div>
-    <div id="reward-message"></div>
-  </div>
-  <button id="unlock-btn">Unlock Toggles</button>
-  <table>
-    <thead>
-      <tr><th>Day</th><th>Daphne's Chores</th><th>Naomi's Chores</th></tr>
-    </thead>
-    <tbody id="chores-table"></tbody>
-  </table>
+<div id="reward-animation"></div>
+<h1>Weekly Chores Table for Daphne & Naomi</h1>
+<div id="progress-container">
+  <div id="progress-bar"><div id="progress-fill"></div></div>
+  <div id="reward-message"></div>
+</div>
+<button id="unlock-btn">Unlock Toggles</button>
+<table>
+  <thead>
+    <tr><th>Day</th><th>Daphne's Chores</th><th>Naomi's Chores</th></tr>
+  </thead>
+  <tbody id="chores-table"></tbody>
+</table>
 
-  <script src="https://www.gstatic.com/firebasejs/10.5.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.5.2/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.5.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.5.2/firebase-database-compat.js"></script>
 
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyC-LdUp3UKbX6pS1_vRmXVyK9FBSdqHNCs",
-      authDomain: "chores-972bd.firebaseapp.com",
-      databaseURL: "https://chores-972bd-default-rtdb.firebaseio.com",
-      projectId: "chores-972bd",
-      storageBucket: "chores-972bd.appspot.com",
-      messagingSenderId: "761975957910",
-      appId: "1:761975957910:web:edfc23fc53a5ea7db155b7",
-      measurementId: "G-EW18VSQN20"
-    };
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyC-LdUp3UKbX6pS1_vRmXVyK9FBSdqHNCs",
+    authDomain: "chores-972bd.firebaseapp.com",
+    databaseURL: "https://chores-972bd-default-rtdb.firebaseio.com",
+    projectId: "chores-972bd",
+    storageBucket: "chores-972bd.appspot.com",
+    messagingSenderId: "761975957910",
+    appId: "1:761975957910:web:edfc23fc53a5ea7db155b7",
+    measurementId: "G-EW18VSQN20"
+  };
 
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
 
-    const weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
-    const schedule = [];
+  const weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+  const schedule = [];
 
-    weekdays.forEach(day => {
-      schedule.push({
-        day,
-        daphne: ["🐾 Pets", "🎒 Getting Ready", "📚 Homework"],
-        naomi: ["🐾 Pets", "🎒 Getting Ready", "📚 Homework"]
-      });
+  weekdays.forEach(day => {
+    schedule.push({
+      day,
+      daphne: ["🐾 Pets", "🎒 Getting Ready", "📚 Homework"],
+      naomi: ["🐾 Pets", "🎒 Getting Ready", "📚 Homework"]
     });
+  });
 
-    schedule.push(
-      { day: "Saturday", daphne: ["🐾 Pets", "—", "—"], naomi: ["🐾 Pets", "—", "—"] },
-      { day: "Sunday", daphne: ["🐾 Pets", "—", "—"], naomi: ["🐾 Pets", "—", "—"] }
-    );
+  const table = document.getElementById("chores-table");
 
-    const table = document.getElementById("chores-table");
+  schedule.forEach(entry => {
+    const row1 = document.createElement("tr");
+    row1.className = "day-row";
+    row1.innerHTML = `
+      <td rowspan="3">${entry.day}</td>
+      <td><div class="chore-cell">${entry.daphne[0]} ${createToggle(entry.day, "Daphne", entry.daphne[0])}</div></td>
+      <td><div class="chore-cell">${entry.naomi[0]} ${createToggle(entry.day, "Naomi", entry.naomi[0])}</div></td>
+    `;
+    const row2 = document.createElement("tr");
+    row2.className = "chore-row";
+    row2.innerHTML = `
+      <td><div class="chore-cell">${entry.daphne[1] !== "—" ? entry.daphne[1] + " " + createToggle(entry.day, "Daphne", entry.daphne[1]) : "—"}</div></td>
+      <td><div class="chore-cell">${entry.naomi[1] !== "—" ? entry.naomi[1] + " " + createToggle(entry.day, "Naomi", entry.naomi[1]) : "—"}</div></td>
+    `;
+    const row3 = document.createElement("tr");
+    row3.className = "chore-row";
+    row3.innerHTML = `
+      <td><div class="chore-cell">${entry.daphne[2] !== "—" ? entry.daphne[2] + " " + createToggle(entry.day, "Daphne", entry.daphne[2]) : "—"}</div></td>
+      <td><div class="chore-cell">${entry.naomi[2] !== "—" ? entry.naomi[2] + " " + createToggle(entry.day, "Naomi", entry.naomi[2]) : "—"}</div></td>
+    `;
+    table.appendChild(row1);
+    table.appendChild(row2);
+    table.appendChild(row3);
+  });
 
-    schedule.forEach(entry => {
-      const row1 = document.createElement("tr");
-      row1.className = "day-row";
-      row1.innerHTML = `
-        <td rowspan="3">${entry.day}</td>
-        <td>${entry.daphne[0]} ${createToggle(entry.day, "Daphne", entry.daphne[0])}</td>
-        <td>${entry.naomi[0]} ${createToggle(entry.day, "Naomi", entry.naomi[0])}</td>
-      `;
-      const row2 = document.createElement("tr");
-      row2.className = "chore-row";
-      row2.innerHTML = `
-        <td>${entry.daphne[1] !== "—" ? entry.daphne[1] + " " + createToggle(entry.day, "Daphne", entry.daphne[1]) : "—"}</td>
-        <td>${entry.naomi[1] !== "—" ? entry.naomi[1] + " " + createToggle(entry.day, "Naomi", entry.naomi[1]) : "—"}</td>
-      `;
-      const row3 = document.createElement("tr");
-      row3.className = "chore-row";
-      row3.innerHTML = `
-        <td>${entry.daphne[2] !== "—" ? entry.daphne[2] + " " + createToggle(entry.day, "Daphne", entry.daphne[2]) : "—"}</td>
-        <td>${entry.naomi[2] !== "—" ? entry.naomi[2] + " " + createToggle(entry.day, "Naomi", entry.naomi[2]) : "—"}</td>
-      `;
-      table.appendChild(row1);
-      table.appendChild(row2);
-      table.appendChild(row3);
-    });
-
-    function createToggle(day, kid, chore) {
-      const id = `${day}-${kid}-${chore}`.replace(/\s+/g, '-');
-      return `
-        <label class="toggle locked">
-          <input type="checkbox" id="${id}" onchange="updateToggle('${id}')" disabled />
-          <span class="slider"></span>
-        </label>
-      `;
-    }
-
-    function updateToggle(id) {
-      const checked = document.getElementById(id).checked;
-      db.ref("toggles/" + id).set(checked);
-      calculateProgress();
-    }
-
-    function loadToggles() {
-      db.ref("toggles").once("value", snapshot => {
-        const data = snapshot.val();
-        if (data) {
-          Object.keys(data).forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.checked = data[id];
-          });
-        }
-        calculateProgress();
-      });
-    }
-
-    function calculateProgress() {
-      const toggles = document.querySelectorAll("input[type='checkbox']");
-      const total = toggles.length;
-      let completed = 0;
-      toggles.forEach(t => { if (t.checked) completed++; });
-      const percent = Math.round((completed / total) * 100);
-      document.getElementById("progress-fill").style.width = percent + "%";
-      document.getElementById("reward-message").textContent =
-        percent >= 70 ? "🎉 Starbucks reward unlocked!" : "";
-    }
-
-document.getElementById("unlock-btn").addEventListener("click", () => {
-  const passcode = prompt("Enter admin passcode:");
-  if (passcode === "2025") {
-    document.querySelectorAll(".toggle").forEach(toggle => {
-      toggle.classList.remove("locked");
-      const input = toggle.querySelector("input");
-      if (input) input.disabled = false; // ✅ Enable checkbox
-    });
-  } else {
-    alert("Incorrect passcode.");
+  function createToggle(day, kid, chore) {
+    const id = `${day}-${kid}-${chore}`.replace(/\s+/g, '-');
+    return `
+      <label class="toggle locked">
+        <input type="checkbox" id="${id}" onchange="updateToggle('${id}')" disabled />
+        <span class="slider"></span>
+      </label>
+    `;
   }
-});
 
+  function updateToggle(id) {
+    const checked = document.getElementById(id).checked;
+    db.ref("toggles/" + id).set(checked);
+    calculateProgress();
+  }
 
+  function loadToggles() {
+    db.ref("toggles").once("value", snapshot => {
+      const data = snapshot.val();
+      if (data) {
+        Object.keys(data).forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.checked = data[id];
+        });
+      }
+      calculateProgress();
+    });
+  }
 
-    window.onload = loadToggles;
-  </script>
+  function calculateProgress() {
+    const toggles = document.querySelectorAll("input[type='checkbox']");
+    const total = toggles.length;
+    let completed = 0;
+    toggles.forEach(t => {
+      if (t.checked) completed++;
+    });
+    const percent = (completed / total) * 100;
+    const rewardMessage = document.getElementById("reward-message");
+    const rewardAnimation = document.getElementById("reward-animation");
+
+    const barWidth = percent >= 60 ? 100 : percent;
+    document.getElementById("progress-fill").style.width = barWidth + "%";
+
+    if (percent >= 60) {
+      rewardMessage.textContent = "🎉 Starbucks reward unlocked!";
+      rewardMessage.classList.remove("animate-reward");
+      void rewardMessage.offsetWidth;
+      rewardMessage.classList.add("animate-reward");
+
+      // Add the active class to trigger the full-screen animation
+      rewardAnimation.classList.add("active");
+      // Remove the class after 2 seconds to reset the animation
+      setTimeout(() => {
+        rewardAnimation.classList.remove("active");
+      }, 2000);
+
+    } else {
+      rewardMessage.textContent = "";
+      rewardMessage.classList.remove("animate-reward");
+      rewardAnimation.classList.remove("active");
+    }
+  }
+
+  document.getElementById("unlock-btn").addEventListener("click", () => {
+    const passcode = prompt("Enter admin passcode:");
+    if (passcode === "2025") {
+      document.querySelectorAll(".toggle").forEach(toggle => {
+        toggle.classList.remove("locked");
+        const input = toggle.querySelector("input");
+        if (input) input.disabled = false;
+      });
+    } else {
+      alert("Incorrect passcode.");
+    }
+  });
+
+  window.onload = loadToggles;
+</script>
 </body>
 </html>
-
